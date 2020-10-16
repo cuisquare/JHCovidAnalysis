@@ -1,3 +1,5 @@
+library(plotly)
+
 getLatestAvailableDate <- function(JH_Data,CountryName) {
   JH_Data %>% 
     filter(Country_Region == CountryName) %>%
@@ -13,21 +15,24 @@ getLatestDataSimple <- function(JH_Data,CountryName) {
     filter(Date == LatestAvailableDate)
 }
 
-getLatestData <- function(JH_Data,CountryName,spanDays=FALSE) {
-  LatestAvailableDate <- getLatestAvailableDate(JH_Data,CountryName)
+getLatestData <- function(JH_Data,CountryList,spanDays=FALSE) {
   
-  print(paste("nbDays =",nbDays))
+  LatestAvailableDate <- as_date(min(sapply(CountryList,
+                                    FUN=function(CN) {
+                                      as_date(getLatestAvailableDate(master_data,CN))})))
   
-  if (nbDays==FALSE | !(is.numeric(nbDays))) {
+  print(paste("spanDays =",spanDays))
+  
+  if (spanDays==FALSE | !(is.numeric(spanDays))) {
     StartDate <- LatestAvailableDate
-    print("nbDays not assigned or not numeric")
+    print("spanDays not assigned or not numeric")
   } else {
     StartDate <- LatestAvailableDate - days(spanDays-1)
   }
   print(paste("StartDate = ",StartDate))
   
   JH_Data %>% 
-    filter(Country_Region == CountryName) %>%
+    filter(Country_Region %in% CountryList) %>%
     filter(Date <= LatestAvailableDate & Date >= StartDate) 
 }
 
@@ -37,18 +42,53 @@ JHplot_ProvinceLevel <- function(JH_Data,CountryList,VarName) {
     filter(Country_Region %in% CountryList) %>%
     ggplot(aes_string("Date",VarName,color="Province_State")) +
     geom_point() + geom_line()
-  print(p)
+  print(ggplotly(p))
+  #return(p)
 }
 
 JHplot_CountryLevel <- function(JH_Data,CountryList,VarName) {
-  p <- JH_Data %>% 
+  thedata <- JH_Data %>% 
     filter(Date>ymd("20200315")) %>%
     filter(Country_Region %in% CountryList) %>%
+    filter(!is.na(!!as.name(VarName))) %>%
     group_by(Country_Region,Date) %>%
-    summarise(!!VarName := sum(!!as.name(VarName))) %>%
+    summarise(!!VarName := sum(!!as.name(VarName))) 
+  
+  theplot <- thedata%>%
     ggplot(aes_string("Date",VarName,color="Country_Region")) +
-    geom_point() + geom_line()
-  print(p)
+    geom_point() + geom_line() 
+  print(ggplotly(theplot))
+  #return(theplot)
+}
+
+JHGetProgress <- function(JH_Data,CountryList,VarName) {
+  CountryList <- c("United Kingdom","France","Italy","Germany","Belgium","Greece")
+  
+  pos_min <- function(x) {
+    min(x[x>0])
+  }
+  Progress <- master_data %>% 
+    filter(Country_Region %in% CountryList & is.na(Province_State)) %>%
+    filter(Date > ymd("20200401")) %>%
+    group_by(Country_Region,Population) %>%
+    summarise_at(VarName,list(pos_min, max)) 
+  
+  Progress <- Progress %>%
+    rename(!!as.name(paste("min_",VarName,sep="")) := !!as.name("fn1"),
+           !!as.name(paste("max_",VarName,sep="")) := !!as.name("fn2"))
+  
+  LatestData <- master_data %>%
+    filter(is.na(Province_State)) %>%
+    getLatestData(CountryList) %>%
+    select(Country_Region,!!as.name(VarName)) 
+  
+  LatestData <- LatestData %>%
+    rename(!!as.name(paste("current_",VarName,sep="")) := !!as.name(VarName))
+  
+  Progress <- Progress %>%
+    left_join(LatestData,by="Country_Region")
+  
+  return (Progress)
 }
 
 JHDateYWasXWhen <- function(JH_Data,VarName,CountryX,CountryY,DateX,DateLookUpFrom) {

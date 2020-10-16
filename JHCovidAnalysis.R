@@ -12,25 +12,25 @@ library(lubridate)
 options(digits = 3)   # report 3 significant digits
 
 ##check discrepancy UK Gov vs JH
-CompUKvsJH <- checkDiscJHvsUKGOV(master_data)
+#CompUKvsJH <- checkDiscJHvsUKGOV(master_data) #TODO broken, fix
 
-#TODO get date that two countries matched supposing constant progression, how many days the countries are ahead / behind each other
+
 
 ##Historical Data - Best vs Worst
-CountryList <- c("United Kingdom","France","Italy","Germany","Belgium")
-pos_min <- function(x) {
-  min(x[x>0])
-}
-Progress_IncreaseDeaths <- master_data %>% 
-  filter(Country_Region %in% CountryList & is.na(Province_State)) %>%
-  filter(Date > ymd("20200401")) %>%
-  group_by(Country_Region,Population) %>%
-  summarise_at(c("Increase_Deaths","Increase_Weighted_Deaths"),list(pos_min, max))%>%
-  rename(min_Increase_Deaths = Increase_Deaths_fn1, max_Increase_Deaths = Increase_Deaths_fn2) %>%
-  rename(min_Increase_Weighted_Deaths = Increase_Weighted_Deaths_fn1, max_Increase_Weighted_Deaths = Increase_Weighted_Deaths_fn2)
+#Progress
+CountryList <- c("United Kingdom","France","Italy","Germany","Belgium","Greece")
+
+Progress_Increase_Deaths <- master_data %>% 
+  JHGetProgress(COuntryList,"Increase_Deaths_Avg") 
+
+Progress_Increase_Weighted_Deaths <- master_data %>%
+  JHGetProgress(COuntryList,"Increase_Weighted_Deaths_Avg") 
+
+Progress <- Progress_Increase_Deaths %>%
+  left_join(Progress_Increase_Weighted_Deaths)
 
 master_data %>%
-  JHplot_CountryLevel(CountryList,"Increase_Weighted_Deaths")
+  JHplot_CountryLevel(CountryList,"Increase_Weighted_Deaths_Avg_Avg")
 
 master_data %>%
   filter(Date>ymd("20200601")) %>%
@@ -42,6 +42,9 @@ LatestData_UK <- getLatestData(master_data, "United Kingdom")
 
 LatestData_20days_NoRegions_UK <- getLatestData(master_data, "United Kingdom",20) %>% filter(is.na(Province_State))
 LatestData_20days_NoRegions_FR <- getLatestData(master_data, "France",20) %>% filter(is.na(Province_State))
+LatestData_20days_NoRegions_IT <- getLatestData(master_data, "Italy",20) %>% filter(is.na(Province_State))
+LatestData_20days_NoRegions_BL <- getLatestData(master_data, "Belgium",20) %>% filter(is.na(Province_State))
+
 
 #weird coming back to life France
 #TODO: filter for start date last date before first discrepancy
@@ -65,7 +68,11 @@ LatestData_US <- getLatestData(master_data, "United States")
 ##Ranks
 #TODO Maybe include ranks as mutated column ?
 last_day <- master_data %>% pull(Date) %>% max()
-ntop <- 40
+ntop <- 50
+top_Deaths <- master_data %>%
+  filter(Date == last_day) %>%
+  slice_max(order_by = Deaths,n=ntop) %>% 
+  select(Country_Region,Deaths)
 top_Weighted_Deaths <- master_data %>%
   filter(Date == last_day) %>%
   slice_max(order_by = Weighted_Deaths,n=ntop) %>% 
@@ -81,6 +88,43 @@ top_Increase_Weighted_Deaths <- master_data %>%
 top_Increase_Weighted_Confirmed <- master_data %>%
   filter(Date == last_day) %>%
   slice_max(order_by = Increase_Weighted_Confirmed,n=ntop) %>%
+  select(Country_Region,Increase_Weighted_Confirmed)
+
+CountryList_top10_Increase_Weighted_Deaths <- top_Increase_Weighted_Deaths %>% 
+  slice_max(order_by = Increase_Weighted_Deaths,n=10) %>%
+  pull(Country_Region)
+#very jittery
+#DONE rolling average
+master_data %>%
+  JHplot_CountryLevel(CountryList_top10_Increase_Weighted_Deaths,
+                      "Increase_Weighted_Deaths_Avg_Avg")
+
+
+#TODO create a function for this
+nbottom <- 100
+bottom_base <- master_data %>%
+  filter(Date == last_day) %>%
+  group_by(Country_Region,Date) %>%
+  summarise(Deaths = sum(Deaths),
+            Weighted_Deaths = sum(Weighted_Deaths),
+            Weighted_Confirmed = sum(Weighted_Confirmed),
+            Increase_Weighted_Deaths = sum(Increase_Weighted_Deaths),
+            Increase_Weighted_Confirmed = sum(Increase_Weighted_Confirmed)) %>%
+  ungroup() 
+bottom_Deaths <- bottom_base %>%
+  slice_min(order_by = Deaths,n=nbottom) %>% 
+  select(Country_Region,Deaths)
+bottom_Weighted_Deaths <- bottom_base %>%
+  slice_min(order_by = Weighted_Deaths,n=nbottom) %>% 
+  select(Country_Region,Weighted_Deaths)
+bottom_Weighted_Confirmed <- bottom_base %>%
+  slice_min(order_by = Weighted_Deaths,n=nbottom) %>% 
+  select(Country_Region,Weighted_Confirmed)
+bottom_Increase_Weighted_Deaths <- bottom_base %>%
+  slice_min(order_by = Increase_Weighted_Deaths,n=nbottom) %>%
+  select(Country_Region,Increase_Weighted_Deaths)
+bottom_Increase_Weighted_Confirmed <- bottom_base %>%
+  slice_min(order_by = Increase_Weighted_Confirmed,n=nbottom) %>%
   select(Country_Region,Increase_Weighted_Confirmed)
 
 ##Plots
@@ -106,21 +150,40 @@ master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Weighted_Confirmed")
 
 #World
-CountryList <- c("France","United Kingdom","Spain","Germany","United States","Brazil","Italy","Belgium")
+CountryList <- c("France",
+                 "United Kingdom",
+                 "Spain",
+                 "Germany",
+                 "United States",
+                 "Brazil",
+                 "Italy",
+                 "Belgium",
+                 "Croatia",
+                 "Greece")
 master_data %>%
-  filter(Date > ymd("20200601")) %>%
+  filter(Date > ymd("20200201")) %>%
   JHplot_CountryLevel(CountryList,"Weighted_Deaths")
 master_data %>%
-  filter(Date > ymd("20200601")) %>%
+  filter(Date > ymd("20200201")) %>%
+  JHplot_CountryLevel(CountryList,"Deaths")
+master_data %>%
+  filter(Date > ymd("20200201")) %>%
   JHplot_CountryLevel(CountryList,"Weighted_Confirmed")
 master_data %>%
-  filter(Date > ymd("20200601")) %>%
+  filter(Date > ymd("20200201")) %>%
+  JHplot_CountryLevel(CountryList,"Confirmed")
+master_data %>%
+  filter(Date > ymd("20200201")) %>%
   JHplot_CountryLevel(CountryList,"Increase_Weighted_Deaths")
 master_data %>%
-  filter(Date > ymd("20200601")) %>%
+  filter(Date > ymd("20200201")) %>%
+  JHplot_CountryLevel(CountryList,"Increase_Deaths")
+master_data %>%
+  filter(Date > ymd("20200201")) %>%
   JHplot_CountryLevel(CountryList,"Increase_Weighted_Confirmed")
-
-
+master_data %>%
+  filter(Date > ymd("20200201")) %>%
+  JHplot_CountryLevel(CountryList,"Increase_Confirmed")
 
 ##exploration of robust country to country comparison
 
@@ -163,8 +226,10 @@ Date_ItalyWasUkNow <- JHDateYWasXWhen(
 
 #TODO plot ranks over time ?
 
+CountryList <- c("Italy","France","United Kingdom","Germany","Spain","Croatia","Greece")
+
 master_data %>%
-  JHplot_CountryLevel(c("Italy","France","United Kingdom","Germany","Belgium"),"Increase_Weighted_Deaths")
+  JHplot_CountryLevel(CountryList,"Increase_Weighted_Deaths")
 
 #at which date did Italy get as good as UK is now ?
 Date_ItalyWasUkNow <- JHDateYWasXWhen(
@@ -203,10 +268,11 @@ master_data %>%
 #current values of increase increase are about the same but UK starting from a much 
 #higher value of increase
 
+CountryList <- c("Italy","France","United Kingdom","Germany","Spain","Croatia","Greece")
 
 master_data %>% 
   filter(Date > ymd(20200501)) %>%
-  filter(Country_Region %in% c("Italy","France","United Kingdom","Germany")) %>%
+  filter(Country_Region %in% CountryList) %>%
   filter(is.na(Province_State)) %>%
   ggplot(aes(Date,Increase_Deaths,color = Country_Region)) +
   geom_point() + geom_line()
@@ -216,7 +282,7 @@ master_data %>%
 
 master_data %>% 
   filter(Date > ymd(20200601)) %>%
-  filter(Country_Region %in% c("Italy","France","United Kingdom","Germany")) %>%
+  filter(Country_Region %in% CountryList) %>%
   filter(is.na(Province_State)) %>%
   ggplot(aes(Date,Rate_Increase_Deaths,color = Country_Region)) +
   geom_point() + geom_line()
@@ -279,3 +345,5 @@ DateCountriesWereUkNow <- master_data %>%
   group_by(Country_Region) %>%
   summarise(JHDateYWasUKNow(Country_Region))
 colnames(DateCountriesWereUkNow) = c("Country","Date UK Now Achieved")
+
+

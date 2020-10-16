@@ -9,6 +9,9 @@ data_folder <- "./Data/JH_Data_GitHubClone/csse_covid_19_data/csse_covid_19_time
 data_file_deaths <- "time_series_covid19_deaths_global.csv"
 master_data_raw_deaths <- read_csv(paste(data_folder,data_file_deaths,sep=""))
 
+#TODO: ? get data with old metric for death in UK using this link: 
+#https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/909660/COVID-19_Death_Series_20200816.xlsx
+
 #change into tidy data
 last_day_col <- ncol(master_data_raw_deaths)
 master_data_deaths <- master_data_raw_deaths %>% 
@@ -59,7 +62,8 @@ tab <- h %>% rvest::html_nodes("table")
 countries_population <- tab[[1]] %>% 
   rvest::html_table(fill=TRUE) 
 countries_population <- countries_population %>%
-  rename(Country_Region = "Country (or dependent territory)") %>%
+  rename(Country_Region = "Country(or dependent territory)") %>%
+  rename(Population= "Population") %>%
   select(Country_Region,Population) %>%
   mutate(Population = as.numeric(str_replace_all(Population,",",""))) %>%
   mutate(Country_Region = str_replace_all(Country_Region,"\\[.+\\]",""))
@@ -155,15 +159,28 @@ Nb_JHCountriesTotal_After <- master_data %>%  select(Country_Region) %>% unique(
 
 
 #added data
+library(zoo)
 lagvaluedays <- 7
 master_data <- master_data %>%
   group_by(Country_Region,Province_State) %>%
-  mutate(Increase_Deaths = (Deaths - lag(Deaths,lagvaluedays))/lagvaluedays) %>%
-  mutate(Increase_Confirmed = (Confirmed - lag(Confirmed,lagvaluedays))/lagvaluedays) %>%
+  mutate(Increase_Deaths = Deaths - lag(Deaths,1)) %>%
+  mutate(Increase_Deaths_Avg = rollapply(data=Increase_Deaths,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
+  mutate(Increase_Deaths_Avg_Avg = rollapply(data=Increase_Deaths_Avg,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
+  mutate(Increase_Confirmed = Confirmed - lag(Confirmed,1)) %>%
+  mutate(Increase_Confirmed_Avg = rollapply(data=Increase_Confirmed,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
+  mutate(Increase_Confirmed_Avg_Avg = rollapply(data=Increase_Confirmed_Avg,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
   mutate(Weighted_Deaths = Deaths/Population) %>%
   mutate(Weighted_Confirmed = Confirmed/Population) %>%
+  
   mutate(Increase_Weighted_Deaths = (Weighted_Deaths - lag(Weighted_Deaths,lagvaluedays))/lagvaluedays) %>%
+  mutate(Increase_Weighted_Deaths = Weighted_Deaths - lag(Weighted_Deaths,1)) %>%
+  mutate(Increase_Weighted_Deaths_Avg = rollapply(data=Increase_Weighted_Deaths,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
+  mutate(Increase_Weighted_Deaths_Avg_Avg = rollapply(data=Increase_Weighted_Deaths_Avg,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
+  
   mutate(Increase_Weighted_Confirmed = (Weighted_Confirmed - lag(Weighted_Confirmed,lagvaluedays))/lagvaluedays) %>%
+  mutate(Increase_Weighted_Confirmed = Weighted_Confirmed - lag(Weighted_Confirmed,1)) %>%
+  mutate(Increase_Weighted_Confirmed_Avg = rollapply(data=Increase_Weighted_Confirmed,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
+  mutate(Increase_Weighted_Confirmed_Avg_Avg = rollapply(data=Increase_Weighted_Confirmed_Avg,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
   ungroup()
 
 #new data not yet confirmed if useful
