@@ -116,8 +116,15 @@ p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Weighted_Deaths_Avg_Avg")
 p
 ```
-
 ```{r plots3, warning=FALSE}
+CountryList <- c("United Kingdom","France","Italy","Germany","Belgium")
+p <- master_data %>%
+  JHplot_CountryLevel(CountryList,"Increase_Confirmed_Avg_Avg")
+p
+```
+
+
+```{r plots4, warning=FALSE}
 CountryList <- c("United Kingdom","France","Italy","Germany","Belgium")
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Weighted_Confirmed_Avg_Avg")

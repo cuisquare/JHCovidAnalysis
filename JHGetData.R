@@ -27,9 +27,11 @@ data_file_confirmed <- "time_series_covid19_confirmed_global.csv"
 master_data_raw_confirmed <- read_csv(paste(data_folder,data_file_confirmed,sep=""))
 
 #change into tidy data
-last_day_col <- ncol(master_data_raw_confirmed)
 master_data_confirmed <- master_data_raw_confirmed %>% 
-  gather(key="Date",value="Confirmed",5:last_day_col) 
+  select(-Lat,-Long) 
+last_day_col <- ncol(master_data_confirmed)
+master_data_confirmed <- master_data_confirmed %>%
+  gather(key="Date",value="Confirmed",3:last_day_col) 
 
 #reformat dates and long char column names
 master_data_confirmed <- master_data_confirmed %>%
@@ -41,9 +43,11 @@ data_file_recovered <- "time_series_covid19_recovered_global.csv"
 master_data_raw_recovered <- read_csv(paste(data_folder,data_file_recovered,sep=""))
 
 #change into tidy data
-last_day_col <- ncol(master_data_raw_recovered)
 master_data_recovered <- master_data_raw_recovered %>% 
-  gather(key="Date",value="Recovered",5:last_day_col) 
+  select(-Lat,-Long) 
+last_day_col <- ncol(master_data_recovered)
+master_data_recovered <- master_data_recovered %>% 
+  gather(key="Date",value="Recovered",3:last_day_col) 
 
 #reformat dates and long char column names
 master_data_recovered <- master_data_recovered %>%
@@ -54,6 +58,19 @@ master_data_recovered <- master_data_recovered %>%
 master_data <- master_data_deaths
 master_data <- left_join(master_data,master_data_confirmed)
 master_data <- left_join(master_data,master_data_recovered)
+
+#TODO issue on Longitude being slightly different (or precision issue)
+#potential solution, change to character
+# master_data_test <- master_data_confirmed %>%
+#   inner_join(master_data_recovered) %>% 
+#   mutate(Long = as.character(Long)) %>%
+#   filter(Country_Region == "United Kingdom",
+#          is.na(Province_State)) %>% tail()
+# 
+# master_data_deaths_test <- master_data_deaths %>% 
+#   mutate(Long = as.character(Long))  %>%
+#   filter(Country_Region == "United Kingdom",
+#          is.na(Province_State)) %>% tail()
 
 #DONE: get demographic information so results can be normalised
 path <- "https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population"
