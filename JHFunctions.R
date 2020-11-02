@@ -56,7 +56,7 @@ JHplot_CountryLevel <- function(JH_Data,CountryList,VarName) {
   
   theplot <- thedata%>%
     ggplot(aes_string("Date",VarName,color="Country_Region")) +
-    geom_point() + geom_line() 
+    geom_line() #+ geom_point()
   print(ggplotly(theplot))
   #return(theplot)
 }

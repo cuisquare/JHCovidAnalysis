@@ -65,18 +65,18 @@ top_Increase_Weighted_Confirmed <- master_data %>%
 
 ```{r totals_tables,echo=FALSE,message=FALSE, warning=FALSE}
 options(digits = 3)   # report 3 significant digits
-options(scipen = -2)
+#options(scipen = -2)
 #adding abbreviation table
 library(knitr)
 library(kableExtra)
 
-kable(x=top_Deaths,caption="Top 10 Countries - Total Deaths") %>%
+kable(x=top_Deaths,caption=paste("Top",ntop,"Countries - Total Deaths")) %>%
   kable_styling(full_width = F) 
 
-kable(x=top_Weighted_Deaths,caption="Top 10 Countries - Total Weighted Deaths") %>%
+kable(x=top_Weighted_Deaths,caption=paste("Top",ntop,"Countries - Total Weighted Deaths","per",scaling_death,"people")) %>%
   kable_styling(full_width = F) 
 
-kable(x=top_Weighted_Confirmed,caption="Top 10 Countries - Total Weighted Confirmed",format = "html") %>%
+kable(x=top_Weighted_Confirmed,caption=paste("Top",ntop,"Countries - Total Weighted Confirmed","per",scaling_confirmed,"people"),format = "html") %>%
   kable_styling(full_width = F) 
 
 ```
@@ -90,10 +90,10 @@ options(scipen = -2)
 library(knitr)
 library(kableExtra)
 
-kable(x=top_Increase_Weighted_Deaths,caption="Top 10 Countries - Increase Weighted Deaths") %>%
+kable(x=top_Increase_Weighted_Deaths,caption=paste("Top",ntop,"Countries - Increase Weighted Deaths","per",scaling_death,"people")) %>%
   kable_styling(full_width = F) 
 
-kable(x=top_Increase_Weighted_Confirmed,caption="Top 10 Countries - Increase Weighted Confirmed") %>%
+kable(x=top_Increase_Weighted_Confirmed,caption=paste("Top",ntop,"Countries - Increase Weighted Confirmed","per",scaling_confirmed,"people")) %>%
   kable_styling(full_width = F) 
 
 ```
@@ -102,22 +102,38 @@ kable(x=top_Increase_Weighted_Confirmed,caption="Top 10 Countries - Increase Wei
 
 ### Increases
 
+```{r  warning=FALSE}
+CountryList <- c("United Kingdom","France","Italy","Germany","Belgium","Spain","Greece","Sweden","Norway","Finland","United States")
+```
+
+
+```{r  warning=FALSE}
+p <- master_data %>%
+  JHplot_CountryLevel(CountryList,"Deaths")
+p
+```
+
+```{r  warning=FALSE}
+p <- master_data %>%
+  JHplot_CountryLevel(CountryList,"Weighted_Deaths")
+p
+```
+
+
 ```{r plots1, warning=FALSE}
-CountryList <- c("United Kingdom","France","Italy","Germany","Belgium")
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Deaths_Avg_Avg")
 p
 ```
 
-
 ```{r plots2, warning=FALSE}
-CountryList <- c("United Kingdom","France","Italy","Germany","Belgium")
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Weighted_Deaths_Avg_Avg")
 p
 ```
+
+
 ```{r plots3, warning=FALSE}
-CountryList <- c("United Kingdom","France","Italy","Germany","Belgium")
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Confirmed_Avg_Avg")
 p
@@ -125,7 +141,6 @@ p
 
 
 ```{r plots4, warning=FALSE}
-CountryList <- c("United Kingdom","France","Italy","Germany","Belgium")
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Weighted_Confirmed_Avg_Avg")
 p

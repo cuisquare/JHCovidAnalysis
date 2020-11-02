@@ -72,6 +72,11 @@ master_data <- left_join(master_data,master_data_recovered)
 #   filter(Country_Region == "United Kingdom",
 #          is.na(Province_State)) %>% tail()
 
+#TODO: add country density
+#https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population_density
+
+#TODO: add urbanisation level
+
 #DONE: get demographic information so results can be normalised
 path <- "https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population"
 h <- xml2::read_html(path)
@@ -178,6 +183,10 @@ Nb_JHCountriesTotal_After <- master_data %>%  select(Country_Region) %>% unique(
 #added data
 library(zoo)
 lagvaluedays <- 7
+
+scaling_death <- 10^6
+scaling_confirmed <- 10^4
+
 master_data <- master_data %>%
   group_by(Country_Region,Province_State) %>%
   mutate(Increase_Deaths = Deaths - lag(Deaths,1)) %>%
@@ -186,8 +195,8 @@ master_data <- master_data %>%
   mutate(Increase_Confirmed = Confirmed - lag(Confirmed,1)) %>%
   mutate(Increase_Confirmed_Avg = rollapply(data=Increase_Confirmed,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
   mutate(Increase_Confirmed_Avg_Avg = rollapply(data=Increase_Confirmed_Avg,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
-  mutate(Weighted_Deaths = Deaths/Population) %>%
-  mutate(Weighted_Confirmed = Confirmed/Population) %>%
+  mutate(Weighted_Deaths = scaling_death*Deaths/Population) %>%
+  mutate(Weighted_Confirmed = scaling_confirmed*Confirmed/Population) %>%
   
   mutate(Increase_Weighted_Deaths = (Weighted_Deaths - lag(Weighted_Deaths,lagvaluedays))/lagvaluedays) %>%
   mutate(Increase_Weighted_Deaths = Weighted_Deaths - lag(Weighted_Deaths,1)) %>%
