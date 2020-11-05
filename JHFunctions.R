@@ -61,6 +61,28 @@ JHplot_CountryLevel <- function(JH_Data,CountryList,VarName) {
   #return(theplot)
 }
 
+Top_N_CountryLevel <- function(JH_Data,VarName,ntop,datetop) {
+  thedata <- JH_Data %>% 
+    filter(Date==datetop) %>%
+    filter(!is.na(!!as.name(VarName))) %>%
+    group_by(Country_Region) %>%
+    summarise(!!VarName := sum(!!as.name(VarName))) %>%
+    ungroup() %>%
+    slice_max(order_by = !!as.name(VarName),n=ntop)
+  return(thedata)
+}
+
+Bottom_N_CountryLevel <- function(JH_Data,VarName,nbottom,datebottom) {
+  thedata <- JH_Data %>% 
+    filter(Date==datebottom) %>%
+    filter(!is.na(!!as.name(VarName))) %>%
+    group_by(Country_Region) %>%
+    summarise(!!VarName := sum(!!as.name(VarName))) %>%
+    ungroup() %>%
+    slice_min(order_by = !!as.name(VarName),n=nbottom)
+  return(thedata)
+}
+
 JHGetProgress <- function(JH_Data,CountryList,VarName) {
   CountryList <- c("United Kingdom","France","Italy","Germany","Belgium","Greece")
   

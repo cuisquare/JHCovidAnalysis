@@ -35,30 +35,38 @@ library(kableExtra)
 
 last_day <- master_data %>% pull(Date) %>% max()
 ntop <- 20
+
+#totals
 top_Deaths <- master_data %>%
-  filter(Date == last_day) %>%
-  slice_max(order_by = Deaths,n=ntop) %>% 
-  select(Country_Region,Deaths)
+  Top_N_CountryLevel(VarName = "Deaths",
+                                  datetop = last_day,
+                                  ntop = ntop)
 
 top_Weighted_Deaths <- master_data %>%
-  filter(Date == last_day) %>%
-  slice_max(order_by = Weighted_Deaths,n=ntop) %>% 
-  select(Country_Region,Weighted_Deaths)
+  Top_N_CountryLevel(VarName = "Weighted_Deaths",
+                                  datetop = last_day,
+                                  ntop = ntop)
 
-top_Weighted_Confirmed <- master_data %>%
-  filter(Date == last_day) %>%
-  slice_max(order_by = Weighted_Deaths,n=ntop) %>% 
-  select(Country_Region,Weighted_Confirmed)
+#increase
+top_Increase_Deaths_Avg_Avg <- master_data %>%
+  Top_N_CountryLevel(VarName = "Increase_Deaths_Avg_Avg",
+                                  datetop = last_day,
+                                  ntop = ntop)
 
-top_Increase_Weighted_Deaths <- master_data %>%
-  filter(Date == last_day) %>%
-  slice_max(order_by = Increase_Weighted_Deaths,n=ntop) %>%
-  select(Country_Region,Increase_Weighted_Deaths)
+top_Increase_Confirmed_Avg_Avg <- master_data %>%
+  Top_N_CountryLevel(VarName = "Increase_Confirmed_Avg_Avg",
+                                  datetop = last_day,
+                                  ntop = ntop)
 
-top_Increase_Weighted_Confirmed <- master_data %>%
-  filter(Date == last_day) %>%
-  slice_max(order_by = Increase_Weighted_Confirmed,n=ntop) %>%
-  select(Country_Region,Increase_Weighted_Confirmed)
+top_Increase_Weighted_Deaths_Avg_Avg <- master_data %>%
+  Top_N_CountryLevel(VarName = "Increase_Weighted_Deaths_Avg_Avg",
+                                  datetop = last_day,
+                                  ntop = ntop)
+
+top_Increase_Weighted_Confirmed_Avg_Avg <- master_data %>%
+  Top_N_CountryLevel(VarName = "Increase_Weighted_Confirmed_Avg_Avg",
+                                  datetop = last_day,
+                                  ntop = ntop)
 ```
 
 ### Totals
@@ -76,9 +84,6 @@ kable(x=top_Deaths,caption=paste("Top",ntop,"Countries - Total Deaths")) %>%
 kable(x=top_Weighted_Deaths,caption=paste("Top",ntop,"Countries - Total Weighted Deaths","per",scaling_death,"people")) %>%
   kable_styling(full_width = F) 
 
-kable(x=top_Weighted_Confirmed,caption=paste("Top",ntop,"Countries - Total Weighted Confirmed","per",scaling_confirmed,"people"),format = "html") %>%
-  kable_styling(full_width = F) 
-
 ```
 
 ### Increases
@@ -90,57 +95,62 @@ options(scipen = -2)
 library(knitr)
 library(kableExtra)
 
-kable(x=top_Increase_Weighted_Deaths,caption=paste("Top",ntop,"Countries - Increase Weighted Deaths","per",scaling_death,"people")) %>%
+kable(x=top_Increase_Deaths_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Deaths Avg","per",scaling_death,"people")) %>%
   kable_styling(full_width = F) 
 
-kable(x=top_Increase_Weighted_Confirmed,caption=paste("Top",ntop,"Countries - Increase Weighted Confirmed","per",scaling_confirmed,"people")) %>%
+kable(x=top_Increase_Confirmed_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Confirmed Avg","per",scaling_confirmed,"people")) %>%
+  kable_styling(full_width = F) 
+
+kable(x=top_Increase_Weighted_Deaths_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Weighted Deaths Avg","per",scaling_death,"people")) %>%
+  kable_styling(full_width = F) 
+
+kable(x=top_Increase_Weighted_Confirmed_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Weighted Confirmed Avg","per",scaling_confirmed,"people")) %>%
   kable_styling(full_width = F) 
 
 ```
 
 ## Plots
 
-### Increases
 
 ```{r  warning=FALSE}
-CountryList <- c("United Kingdom","France","Italy","Germany","Belgium","Spain","Greece","Sweden","Norway","Finland","United States")
+CountryList <- c("United Kingdom","France","Italy","Germany","Belgium","Spain","Greece","Sweden","Norway","Finland")
 ```
 
+### Totals
 
-```{r  warning=FALSE}
+```{r  ,echo=FALSE,message=FALSE, warning=FALSE}
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Deaths")
 p
 ```
 
-```{r  warning=FALSE}
+```{r  ,echo=FALSE,message=FALSE, warning=FALSE}
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Weighted_Deaths")
 p
 ```
 
+### Increases
 
-```{r plots1, warning=FALSE}
+```{r ,echo=FALSE,message=FALSE, warning=FALSE}
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Deaths_Avg_Avg")
 p
 ```
 
-```{r plots2, warning=FALSE}
-p <- master_data %>%
-  JHplot_CountryLevel(CountryList,"Increase_Weighted_Deaths_Avg_Avg")
-p
-```
-
-
-```{r plots3, warning=FALSE}
+```{r ,echo=FALSE,message=FALSE, warning=FALSE}
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Confirmed_Avg_Avg")
 p
 ```
 
+```{r ,echo=FALSE,message=FALSE, warning=FALSE}
+p <- master_data %>%
+  JHplot_CountryLevel(CountryList,"Increase_Weighted_Deaths_Avg_Avg")
+p
+```
 
-```{r plots4, warning=FALSE}
+```{r ,echo=FALSE,message=FALSE, warning=FALSE}
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Weighted_Confirmed_Avg_Avg")
 p
