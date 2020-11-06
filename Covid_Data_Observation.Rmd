@@ -12,6 +12,10 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# chunk option dev="svg" produces very large vector graphics files
+knitr::opts_chunk$set(dev="svg")
+# chunk option dev="png" is the default raster graphics format for HTML output
+knitr::opts_chunk$set(dev="png")
 ```
 
 ```{r source_functions, echo=FALSE,message=FALSE, warning=FALSE}
@@ -118,13 +122,20 @@ CountryList <- c("United Kingdom","France","Italy","Germany","Belgium","Spain","
 
 ### Totals
 
-```{r  ,echo=FALSE,message=FALSE, warning=FALSE}
+```{r,echo=FALSE,message=FALSE, warning=FALSE}
+dpival <- 36
+widthval <- "800px"
+heightval <- "600px"
+```
+
+
+```{r  ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Deaths")
 p
 ```
 
-```{r  ,echo=FALSE,message=FALSE, warning=FALSE}
+```{r  ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Weighted_Deaths")
 p
@@ -132,25 +143,25 @@ p
 
 ### Increases
 
-```{r ,echo=FALSE,message=FALSE, warning=FALSE}
+```{r ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Deaths_Avg_Avg")
 p
 ```
 
-```{r ,echo=FALSE,message=FALSE, warning=FALSE}
+```{r ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Confirmed_Avg_Avg")
 p
 ```
 
-```{r ,echo=FALSE,message=FALSE, warning=FALSE}
+```{r ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Weighted_Deaths_Avg_Avg")
 p
 ```
 
-```{r ,echo=FALSE,message=FALSE, warning=FALSE}
+```{r ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
 p <- master_data %>%
   JHplot_CountryLevel(CountryList,"Increase_Weighted_Confirmed_Avg_Avg")
 p
