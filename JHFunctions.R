@@ -36,17 +36,21 @@ getLatestData <- function(JH_Data,CountryList,spanDays=FALSE) {
     filter(Date <= LatestAvailableDate & Date >= StartDate) 
 }
 
-JHplot_ProvinceLevel <- function(JH_Data,CountryList,VarName) {
-  p <- JH_Data %>% 
+JHplot_ProvinceLevel <- function(JH_Data,CountryList,VarName,simple=TRUE) {
+  theplot <- JH_Data %>% 
     filter(Date>ymd("20200315")) %>%
     filter(Country_Region %in% CountryList) %>%
     ggplot(aes_string("Date",VarName,color="Province_State")) +
     geom_point() + geom_line()
-  print(ggplotly(p))
+  if (simple) {
+    print(theplot)
+  } else {
+    print(ggplotly(theplot))    
+  }
   #return(p)
 }
 
-JHplot_CountryLevel <- function(JH_Data,CountryList,VarName) {
+JHplot_CountryLevel <- function(JH_Data,CountryList,VarName,simple=TRUE) {
   thedata <- JH_Data %>% 
     filter(Date>ymd("20200315")) %>%
     filter(Country_Region %in% CountryList) %>%
@@ -57,7 +61,11 @@ JHplot_CountryLevel <- function(JH_Data,CountryList,VarName) {
   theplot <- thedata%>%
     ggplot(aes_string("Date",VarName,color="Country_Region")) +
     geom_line() #+ geom_point()
-  print(ggplotly(theplot))
+  if (simple) {
+    print(theplot)
+  } else {
+    print(ggplotly(theplot))    
+  }
   #return(theplot)
 }
 
