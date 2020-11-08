@@ -50,7 +50,7 @@ JHplot_ProvinceLevel <- function(JH_Data,CountryList,VarName,simple=TRUE) {
   #return(p)
 }
 
-JHplot_CountryLevel <- function(JH_Data,CountryList,VarName,simple=TRUE) {
+JHplot_CountryLevel <- function(JH_Data,CountryList,VarName,simple=FALSE) {
   thedata <- JH_Data %>% 
     filter(Date>ymd("20200315")) %>%
     filter(Country_Region %in% CountryList) %>%
@@ -64,7 +64,7 @@ JHplot_CountryLevel <- function(JH_Data,CountryList,VarName,simple=TRUE) {
   if (simple) {
     print(theplot)
   } else {
-    print(ggplotly(theplot))    
+    ggplotly(theplot)    
   }
   #return(theplot)
 }

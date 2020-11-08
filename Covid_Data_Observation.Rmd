@@ -3,6 +3,9 @@ title: "Covid Data Observation"
 author: "Nicolas Vecchione"
 date: "Last Updated: `r format(Sys.time(), '%d/%m/%Y %H:%M:%S')`"
 output: 
+  pdf_document:
+    toc: true
+    toc_depth: 3
   html_document:
     css: mystyles.css
     toc: true
@@ -16,6 +19,16 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(dev="svg")
 # chunk option dev="png" is the default raster graphics format for HTML output
 knitr::opts_chunk$set(dev="png")
+# set default dpi and width 
+knitr::opts_chunk$set(dpi=300,
+                      out.width="400px", 
+                      out.height = "300px")
+
+if(knitr::is_html_output()) {
+  simple_plot_type <- FALSE
+} else {
+  simple_plot_type <- TRUE
+}
 ```
 
 ```{r source_functions, echo=FALSE,message=FALSE, warning=FALSE}
@@ -73,9 +86,36 @@ top_Increase_Weighted_Confirmed_Avg_Avg <- master_data %>%
                                   ntop = ntop)
 ```
 
+
+### Increases
+
+```{r increases_deaths_tables,echo=FALSE,message=FALSE, warning=FALSE}
+options(digits = 3)   # report 3 significant digits
+options(scipen = -2)
+#adding abbreviation table
+library(knitr)
+library(kableExtra)
+
+kable(x=top_Increase_Deaths_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Deaths Avg Avg")) %>%
+  kable_styling(full_width = F) 
+
+kable(x=top_Increase_Weighted_Deaths_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Weighted Deaths Avg","per",scaling_death,"people")) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r increases_confirmed_tables,echo=FALSE,message=FALSE, warning=FALSE}
+kable(x=top_Increase_Confirmed_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Confirmed Avg Avg")) %>%
+  kable_styling(full_width = F) 
+
+kable(x=top_Increase_Weighted_Confirmed_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Weighted Confirmed Avg","per",scaling_confirmed,"people")) %>%
+  kable_styling(full_width = F) 
+
+```
+
 ### Totals
 
-```{r totals_tables,echo=FALSE,message=FALSE, warning=FALSE}
+```{r totals_deaths_tables,echo=FALSE,message=FALSE, warning=FALSE}
 options(digits = 3)   # report 3 significant digits
 #options(scipen = -2)
 #adding abbreviation table
@@ -90,79 +130,47 @@ kable(x=top_Weighted_Deaths,caption=paste("Top",ntop,"Countries - Total Weighted
 
 ```
 
-### Increases
-
-```{r increases_tables,echo=FALSE,message=FALSE, warning=FALSE}
-options(digits = 3)   # report 3 significant digits
-options(scipen = -2)
-#adding abbreviation table
-library(knitr)
-library(kableExtra)
-
-kable(x=top_Increase_Deaths_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Deaths Avg","per",scaling_death,"people")) %>%
-  kable_styling(full_width = F) 
-
-kable(x=top_Increase_Confirmed_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Confirmed Avg","per",scaling_confirmed,"people")) %>%
-  kable_styling(full_width = F) 
-
-kable(x=top_Increase_Weighted_Deaths_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Weighted Deaths Avg","per",scaling_death,"people")) %>%
-  kable_styling(full_width = F) 
-
-kable(x=top_Increase_Weighted_Confirmed_Avg_Avg,caption=paste("Top",ntop,"Countries - Increase Weighted Confirmed Avg","per",scaling_confirmed,"people")) %>%
-  kable_styling(full_width = F) 
-
-```
 
 ## Plots
 
 
 ```{r  warning=FALSE}
-CountryList <- c("United Kingdom","France","Italy","Germany","Belgium","Spain","Greece","Sweden","Norway","Finland")
+CountryList <- c("United Kingdom","France","Italy","Germany","Belgium","Spain","Greece","Sweden","Norway","Finland","Czech Republic")
+```
+
+
+### Increases
+
+```{r echo=FALSE,message=FALSE, warning=FALSE}
+master_data %>%
+  JHplot_CountryLevel(CountryList,"Increase_Deaths_Avg_Avg",simple = simple_plot_type)
+```
+
+```{r  echo=FALSE,message=FALSE, warning=FALSE}
+master_data %>%
+  JHplot_CountryLevel(CountryList,"Increase_Weighted_Deaths_Avg_Avg",simple = simple_plot_type)
+```
+
+
+```{r  echo=FALSE,message=FALSE, warning=FALSE}
+master_data %>%
+  JHplot_CountryLevel(CountryList,"Increase_Confirmed_Avg_Avg",simple = simple_plot_type)
+```
+
+```{r  echo=FALSE,message=FALSE, warning=FALSE}
+master_data %>%
+  JHplot_CountryLevel(CountryList,"Increase_Weighted_Confirmed_Avg_Avg",simple = simple_plot_type)
 ```
 
 ### Totals
 
-```{r,echo=FALSE,message=FALSE, warning=FALSE}
-dpival <- 36
-widthval <- "800px"
-heightval <- "600px"
+```{r echo=FALSE,message=FALSE, warning=FALSE}
+master_data %>%
+  JHplot_CountryLevel(CountryList,"Deaths",simple = simple_plot_type)
 ```
 
-
-```{r  ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
-p <- master_data %>%
-  JHplot_CountryLevel(CountryList,"Deaths")
-p
+```{r  echo=FALSE,message=FALSE, warning=FALSE}
+master_data %>%
+  JHplot_CountryLevel(CountryList,"Weighted_Deaths",simple = simple_plot_type)
 ```
 
-```{r  ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
-p <- master_data %>%
-  JHplot_CountryLevel(CountryList,"Weighted_Deaths")
-p
-```
-
-### Increases
-
-```{r ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
-p <- master_data %>%
-  JHplot_CountryLevel(CountryList,"Increase_Deaths_Avg_Avg")
-p
-```
-
-```{r ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
-p <- master_data %>%
-  JHplot_CountryLevel(CountryList,"Increase_Confirmed_Avg_Avg")
-p
-```
-
-```{r ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
-p <- master_data %>%
-  JHplot_CountryLevel(CountryList,"Increase_Weighted_Deaths_Avg_Avg")
-p
-```
-
-```{r ,dpi=dpival , out.width=widthval, out.height=heightval,echo=FALSE,message=FALSE, warning=FALSE}
-p <- master_data %>%
-  JHplot_CountryLevel(CountryList,"Increase_Weighted_Confirmed_Avg_Avg")
-p
-```
