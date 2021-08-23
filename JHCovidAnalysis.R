@@ -44,6 +44,7 @@ LatestData_20days_NoRegions_UK <- getLatestData(master_data, "United Kingdom",20
 LatestData_20days_NoRegions_FR <- getLatestData(master_data, "France",20) %>% filter(is.na(Province_State))
 LatestData_20days_NoRegions_IT <- getLatestData(master_data, "Italy",20) %>% filter(is.na(Province_State))
 LatestData_20days_NoRegions_BL <- getLatestData(master_data, "Belgium",20) %>% filter(is.na(Province_State))
+LatestData_20days_NoRegions_US<- getLatestData(master_data, "United States",20) %>% filter(is.na(Province_State))
 
 
 #weird coming back to life France

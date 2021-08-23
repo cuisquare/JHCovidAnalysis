@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7400 64-bit) (preloaded format=pdflatex 2020.4.19)  8 NOV 2020 17:54
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7400 64-bit) (preloaded format=pdflatex 2020.4.19)  10 NOV 2020 11:19
 entering extended mode
 **./Covid_Data_Observation.tex
 (Covid_Data_Observation.tex
@@ -803,7 +803,12 @@ ile (type png)
 <use Covid_Data_Observation_files/figure-latex/unnamed-chunk-2-1.png>
 Package pdftex.def Info: Covid_Data_Observation_files/figure-latex/unnamed-chun
 k-2-1.png  used on input line 459.
-(pdftex.def)             Requested size: 401.50134pt x 277.96246pt.
+(pdftex.def)             Requested size: 803.0027pt x 555.92493pt.
+
+Overfull \hbox (333.24768pt too wide) in paragraph at lines 459--460
+[] 
+ []
+
 [1
 
 {C:/Users/Nicol/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}] [2pdfTeX wa
@@ -813,42 +818,42 @@ eady used, duplicate ignored
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
 l.461 \includegraphics
-                      [width=400px,height=300px]{Covid_Data_Observation_file...
+                      [width=800px,height=600px]{Covid_Data_Observation_file...
 pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has
  been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
 l.461 \includegraphics
-                      [width=400px,height=300px]{Covid_Data_Observation_file...
+                      [width=800px,height=600px]{Covid_Data_Observation_file...
 ] [3pdfTeX warning (ext4): destination with the same identifier (name{table.3})
  has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
 l.461 \includegraphics
-                      [width=400px,height=300px]{Covid_Data_Observation_file...
+                      [width=800px,height=600px]{Covid_Data_Observation_file...
 pdfTeX warning (ext4): destination with the same identifier (name{table.4}) has
  been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
 l.461 \includegraphics
-                      [width=400px,height=300px]{Covid_Data_Observation_file...
+                      [width=800px,height=600px]{Covid_Data_Observation_file...
 ] [4pdfTeX warning (ext4): destination with the same identifier (name{table.5})
  has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
 l.461 \includegraphics
-                      [width=400px,height=300px]{Covid_Data_Observation_file...
+                      [width=800px,height=600px]{Covid_Data_Observation_file...
 pdfTeX warning (ext4): destination with the same identifier (name{table.6}) has
  been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
 l.461 \includegraphics
-                      [width=400px,height=300px]{Covid_Data_Observation_file...
+                      [width=800px,height=600px]{Covid_Data_Observation_file...
 ]
 <Covid_Data_Observation_files/figure-latex/unnamed-chunk-3-1.png, id=52, 469.75
 5pt x 325.215pt>
@@ -857,46 +862,71 @@ ile (type png)
 <use Covid_Data_Observation_files/figure-latex/unnamed-chunk-3-1.png>
 Package pdftex.def Info: Covid_Data_Observation_files/figure-latex/unnamed-chun
 k-3-1.png  used on input line 461.
-(pdftex.def)             Requested size: 401.50134pt x 277.96246pt.
-<Covid_Data_Observation_files/figure-latex/unnamed-chunk-4-1.png, id=53, 469.75
+(pdftex.def)             Requested size: 803.0027pt x 555.92493pt.
+
+Overfull \hbox (333.24768pt too wide) in paragraph at lines 461--462
+[][] 
+ []
+
+[5 <./Covid_Data_Observation_files/figure-latex/unnamed-chunk-2-1.png>]
+<Covid_Data_Observation_files/figure-latex/unnamed-chunk-4-1.png, id=58, 469.75
 5pt x 325.215pt>
 File: Covid_Data_Observation_files/figure-latex/unnamed-chunk-4-1.png Graphic f
 ile (type png)
 <use Covid_Data_Observation_files/figure-latex/unnamed-chunk-4-1.png>
 Package pdftex.def Info: Covid_Data_Observation_files/figure-latex/unnamed-chun
 k-4-1.png  used on input line 463.
-(pdftex.def)             Requested size: 401.50134pt x 277.96246pt.
-[5 <./Covid_Data_Observation_files/figure-latex/unnamed-chunk-2-1.png> <./Covid
-_Data_Observation_files/figure-latex/unnamed-chunk-3-1.png>]
-<Covid_Data_Observation_files/figure-latex/unnamed-chunk-5-1.png, id=60, 469.75
+(pdftex.def)             Requested size: 803.0027pt x 555.92493pt.
+
+Overfull \hbox (333.24768pt too wide) in paragraph at lines 463--464
+[][] 
+ []
+
+[6 <./Covid_Data_Observation_files/figure-latex/unnamed-chunk-3-1.png>]
+<Covid_Data_Observation_files/figure-latex/unnamed-chunk-5-1.png, id=64, 469.75
 5pt x 325.215pt>
 File: Covid_Data_Observation_files/figure-latex/unnamed-chunk-5-1.png Graphic f
 ile (type png)
 <use Covid_Data_Observation_files/figure-latex/unnamed-chunk-5-1.png>
 Package pdftex.def Info: Covid_Data_Observation_files/figure-latex/unnamed-chun
 k-5-1.png  used on input line 465.
-(pdftex.def)             Requested size: 401.50134pt x 277.96246pt.
-<Covid_Data_Observation_files/figure-latex/unnamed-chunk-6-1.png, id=61, 469.75
+(pdftex.def)             Requested size: 803.0027pt x 555.92493pt.
+
+Overfull \hbox (333.24768pt too wide) in paragraph at lines 465--466
+[][] 
+ []
+
+[7 <./Covid_Data_Observation_files/figure-latex/unnamed-chunk-4-1.png>]
+<Covid_Data_Observation_files/figure-latex/unnamed-chunk-6-1.png, id=71, 469.75
 5pt x 325.215pt>
 File: Covid_Data_Observation_files/figure-latex/unnamed-chunk-6-1.png Graphic f
 ile (type png)
 <use Covid_Data_Observation_files/figure-latex/unnamed-chunk-6-1.png>
 Package pdftex.def Info: Covid_Data_Observation_files/figure-latex/unnamed-chun
 k-6-1.png  used on input line 470.
-(pdftex.def)             Requested size: 401.50134pt x 277.96246pt.
-[6 <./Covid_Data_Observation_files/figure-latex/unnamed-chunk-4-1.png> <./Covid
-_Data_Observation_files/figure-latex/unnamed-chunk-5-1.png>]
-<Covid_Data_Observation_files/figure-latex/unnamed-chunk-7-1.png, id=69, 469.75
+(pdftex.def)             Requested size: 803.0027pt x 555.92493pt.
+
+Overfull \hbox (333.24768pt too wide) in paragraph at lines 470--471
+[] 
+ []
+
+[8 <./Covid_Data_Observation_files/figure-latex/unnamed-chunk-5-1.png>]
+<Covid_Data_Observation_files/figure-latex/unnamed-chunk-7-1.png, id=78, 469.75
 5pt x 325.215pt>
 File: Covid_Data_Observation_files/figure-latex/unnamed-chunk-7-1.png Graphic f
 ile (type png)
 <use Covid_Data_Observation_files/figure-latex/unnamed-chunk-7-1.png>
 Package pdftex.def Info: Covid_Data_Observation_files/figure-latex/unnamed-chun
 k-7-1.png  used on input line 472.
-(pdftex.def)             Requested size: 401.50134pt x 277.96246pt.
+(pdftex.def)             Requested size: 803.0027pt x 555.92493pt.
+
+Overfull \hbox (333.24768pt too wide) in paragraph at lines 472--473
+[][] 
+ []
+
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 474.
-[7 <./Covid_Data_Observation_files/figure-latex/unnamed-chunk-6-1.png> <./Covid
-_Data_Observation_files/figure-latex/unnamed-chunk-7-1.png>]
+[9 <./Covid_Data_Observation_files/figure-latex/unnamed-chunk-6-1.png>] [10 <./
+Covid_Data_Observation_files/figure-latex/unnamed-chunk-7-1.png>]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 474.
 (Covid_Data_Observation.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 474.
@@ -906,8 +936,8 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 14916 strings out of 480930
- 224052 string characters out of 2899761
+ 14919 strings out of 480930
+ 224071 string characters out of 2899761
  533149 words of memory out of 3000000
  30442 multiletter control sequences out of 15000+200000
  579216 words of font info for 75 fonts, out of 3000000 for 9000
@@ -922,9 +952,9 @@ ic/lm/lmr12.pfb><C:/Users/Nicol/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/p
 ublic/lm/lmr17.pfb><C:/Users/Nicol/AppData/Local/Programs/MiKTeX 2.9/fonts/type
 1/public/lm/lmtk10.pfb><C:/Users/Nicol/AppData/Local/Programs/MiKTeX 2.9/fonts/
 type1/public/lm/lmtt10.pfb>
-Output written on Covid_Data_Observation.pdf (7 pages, 444140 bytes).
+Output written on Covid_Data_Observation.pdf (10 pages, 446836 bytes).
 PDF statistics:
- 127 PDF objects out of 1000 (max. 8388607)
- 27 named destinations out of 1000 (max. 500000)
+ 139 PDF objects out of 1000 (max. 8388607)
+ 30 named destinations out of 1000 (max. 500000)
  10319 words of extra memory for PDF output out of 12000 (max. 10000000)
 

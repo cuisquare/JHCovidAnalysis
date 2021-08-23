@@ -58,13 +58,17 @@ JHplot_CountryLevel <- function(JH_Data,CountryList,VarName,simple=FALSE) {
     group_by(Country_Region,Date) %>%
     summarise(!!VarName := sum(!!as.name(VarName))) 
   
+  #TODO: is aes_string necessary and does it mess up x axis breaks auto change ?
+  
+  #TODO order the countries by order of value at the last available date
+  
   theplot <- thedata%>%
     ggplot(aes_string("Date",VarName,color="Country_Region")) +
     geom_line() #+ geom_point()
   if (simple) {
     print(theplot)
   } else {
-    ggplotly(theplot)    
+    ggplotly(theplot) #%>% layout(xaxis = list(rangeslider = list(type = "date")))
   }
   #return(theplot)
 }
@@ -73,10 +77,15 @@ Top_N_CountryLevel <- function(JH_Data,VarName,ntop,datetop) {
   thedata <- JH_Data %>% 
     filter(Date==datetop) %>%
     filter(!is.na(!!as.name(VarName))) %>%
-    group_by(Country_Region) %>%
-    summarise(!!VarName := sum(!!as.name(VarName))) %>%
+    group_by(Country_Region) 
+  
+  thedata <-thedata %>%
+    summarise(!!VarName := sum(!!as.name(VarName))) 
+  
+  thedata <-thedata%>%
     ungroup() %>%
     slice_max(order_by = !!as.name(VarName),n=ntop)
+  
   return(thedata)
 }
 

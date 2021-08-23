@@ -83,13 +83,20 @@ h <- xml2::read_html(path)
 tab <- h %>% rvest::html_nodes("table")
 countries_population <- tab[[1]] %>% 
   rvest::html_table(fill=TRUE) 
+names(countries_population)[2] <- "Country_Region"
 countries_population <- countries_population %>%
-  rename(Country_Region = "Country(or dependent territory)") %>%
+  #rename(Country_Region = "Country or dependent territory") %>%
   rename(Population= "Population") %>%
-  select(Country_Region,Population) %>%
-  mutate(Population = as.numeric(str_replace_all(Population,",",""))) %>%
-  mutate(Country_Region = str_replace_all(Country_Region,"\\[.+\\]",""))
+  select(Country_Region,Population) 
 
+countries_population <- countries_population %>%
+  mutate(Population = as.numeric(str_replace_all(Population,",",""))) %>%
+  mutate(Country_Region = str_replace_all(Country_Region,"\\[.+\\]","")) %>%
+  mutate(Country_Region = str_replace_all(Country_Region,"†","")) %>%
+  mutate(Country_Region = str_replace_all(Country_Region,"\\(more\\)","")) %>%
+  mutate(Country_Region = str_trim(Country_Region))
+
+str_trim
 #checking data not found
 JHCountries_NotFound_Before <- master_data %>%
   select(Country_Region) %>%
@@ -167,6 +174,9 @@ print(paste("After population data extraction, ",
             " countries in master_data were not found ",
             "in countries_population (and will be dropped):",sep=""))
 print(JHCountries_NotFound_After$Country_Region)
+
+#save data for future run
+
 
 #final join, will leave out anything not found
 master_data <- master_data %>%
