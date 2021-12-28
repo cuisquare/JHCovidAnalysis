@@ -53,21 +53,57 @@ JHplot_ProvinceLevel <- function(JH_Data,CountryList,VarName,simple=TRUE) {
   #return(p)
 }
 
-JHplot_CountryLevel <- function(JH_Data,CountryList,VarName,simple=FALSE,mindiffval = 5) {
-  
-  VarNameString <- VarName
-  VarName <- sym(VarName)
+JHGetdata_CountryLevel <- function(JH_Data,CountryList,VarName) {
+  #'TODO Bug ? this does not give right answer for countries including France
+  #'possibly because of the regional aspect for that country
+  #'810 milions for actual value of 67 gives ratio of 12 which is the 
+  #'number of france regions. this might be due to how the population is
+  #'joined to the original data, it might get added even for rows for which 
+  #'the province is not NA.
+  #'initial attempt is to remove regional information unfortunately this 
+  #'does not work for countries ike australia for which there is only regional
+  #'data available. therefore this needs to be refined
   
   thedata <- JH_Data %>% 
     filter(Date>ymd("20200315")) %>%
-    filter(Country_Region %in% CountryList) %>%
-    filter(!is.na(!!as.name(VarName))) %>%
+    filter(Country_Region %in% CountryList) 
+  
+  thedata <- thedata %>%
+    filter(is.na(Province_State)) #added 20211228 to deal with pop count bug
+  
+  # thedata <- thedata  %>% 
+  #   mutate(isRegionalRow = !is.na(Province_State))  %>%
+  #   group_by(Country_Region) %>%
+  #   mutate(isRegionalOnly = (sum(isRegionalRow) == n())) %>%
+  #   ungroup()
+  
+  # thedata_notregionalonly <- thedata %>%
+  #   filter(!isRegionalOnly) %>%
+  #   filter(!is.na(Province_State))
+  # 
+  # thedata_regionalonly <- thedata %>%
+  #   filter(isRegionalOnly) 
+  # 
+  # thedata <- thedata_notregionalonly %>%
+  #   bind_rows(thedata_regionalonly)
+  
+  thedata <- thedata  %>% 
+    filter(!is.na(!!as.name(VarName))) %>% 
     group_by(Country_Region,Date) %>%
     summarise(!!VarName := sum(!!as.name(VarName))) %>%
-    ungroup() 
+    ungroup()
   
   thedata <- thedata %>%
     mutate(Country_Region= fct_reorder(Country_Region,!!as.name(VarName),function(x) {-tail(x,1)}))
+  
+}
+
+JHGetplot_CountryLevel <- function(JH_Data,CountryList,VarName,add_label = FALSE,adjust_label = FALSE, mindiffval = 5) {
+  VarNameString <- VarName
+  VarName <- sym(VarName)
+  
+  thedata <- JH_Data %>%
+    JHGetdata_CountryLevel(CountryList,VarName)
   
   adjust_vals <- function(vals,mindiffval) {
     #assumes vals sorted in ascending order
@@ -84,11 +120,13 @@ JHplot_CountryLevel <- function(JH_Data,CountryList,VarName,simple=FALSE,mindiff
     filter(Date == max(Date)) %>%
     arrange(!!as.name(VarName))
   
-  thelabeldata$adjustedvarname <- adjust_vals(thelabeldata[[VarNameString]],mindiffval)
+  if (adjust_label) {
+    thelabeldata$adjustedvarname <- adjust_vals(thelabeldata[[VarNameString]],mindiffval)
+  } else {
+    thelabeldata <- thelabeldata %>%
+      mutate(adjustedvarname = !!VarName)
+  }
   
-  thelabeldata <- thelabeldata %>%
-    mutate(!!VarName := adjustedvarname) %>%
-    select(-adjustedvarname)
   
   
   #TODO order the countries by order of value at the last available date
@@ -96,25 +134,36 @@ JHplot_CountryLevel <- function(JH_Data,CountryList,VarName,simple=FALSE,mindiff
   #TODO do the nudging at the labeldata df level but that would require being able to access VarName data
   #on the fly and not being able to so far is the reason we are currently using aes_string
   
-
+  
   theplot <- ggplot(data =thedata, 
                     mapping = aes(Date,!!VarName,color=Country_Region)
-                    ) +
-    geom_line() + 
-    geom_text( data=thelabeldata, 
-               mapping = aes(x = Date,
-                             y = !!VarName,
-                             label = paste0(Country_Region," (",round(!!as.name(VarName),2),")"),
-                             colour = Country_Region
-                             ),
-               check_overlap = TRUE,
-               nudge_x = 20#,
-               # nudge_y = rnorm(n=rep(1,length(thelabeldata[[VarNameString]])),
-               #                 mean = 0,
-               #                 sd = 0.2*thelabeldata[[VarNameString]]
-               #                 )
-               
-              )
+  ) +
+    geom_line() 
+  
+  if (add_label) {
+    theplot <- theplot + 
+      geom_text( data=thelabeldata, 
+                 mapping = aes(x = Date,
+                               y = adjustedvarname, #!!VarName
+                               label = paste0(Country_Region," (",round(!!as.name(VarName),2),")"),
+                               colour = Country_Region
+                 ),
+                 check_overlap = TRUE,
+                 nudge_x = 20#,
+                 # nudge_y = rnorm(n=rep(1,length(thelabeldata[[VarNameString]])),
+                 #                 mean = 0,
+                 #                 sd = 0.2*thelabeldata[[VarNameString]]
+                 #                 )
+                 
+      )    
+  }
+  return(theplot)
+}
+
+JHplot_CountryLevel <- function(JH_Data,CountryList,VarName,simple=FALSE,add_label = FALSE,adjust_label = FALSE, mindiffval = 5) {
+  
+ theplot <- JHGetplot_CountryLevel(JH_Data,CountryList,VarName,add_label,adjust_label,mindiffval)
+
   if (simple) {
     print(theplot)
   } else {
@@ -265,4 +314,37 @@ checkDiscJHvsUKGOV <- function(master_data) {
   
   output <- UK_Deaths_JHvsGOVComp
   
+}
+
+addMissingCountryWideData <- function(JH_Data) {
+  regional_only <- JH_Data %>% 
+    select(Country_Region,Province_State) %>%
+    unique() %>%
+    mutate(isRegional = !is.na(Province_State)) %>%
+    group_by(Country_Region,isRegional) %>%
+    summarise(count = n()) %>%
+    group_by(Country_Region) %>%
+    mutate(hasRegional = (sum(isRegional)>0)) %>%
+    mutate(isRegionalOnly =(hasRegional & (n()==1))) %>%
+    filter(isRegionalOnly) %>%
+    select(Country_Region) %>%
+    unique()
+  
+  curr_names <- c("Province_State", "Country_Region", "Lat", "Long", 
+                  "Deaths", "Confirmed", "Recovered", "Doses_admin", "People_partially_vaccinated", 
+                  "People_fully_vaccinated", "Report_Date_String", "UID")
+  
+  JH_Data_countrylevel_for_regionalonly <- JH_Data %>%
+    filter(Country_Region %in% unique(regional_only$Country_Region)) %>%
+    group_by(across(-c("Province_State","Lat","Long", "Report_Date_String","UID", "Deaths", "Confirmed", "Recovered", "Doses_admin", "People_partially_vaccinated",
+                       "People_fully_vaccinated"))) %>%
+    #group_by(c("Province_State", "Date")) %>%
+    summarise_at(.vars = c("Deaths", "Confirmed", "Recovered", "Doses_admin", "People_partially_vaccinated","People_fully_vaccinated"),
+    .funs = function(x) {sum(x,na.rm = TRUE)}
+    ) 
+  
+  JH_Data <- JH_Data %>%
+    bind_rows(JH_Data_countrylevel_for_regionalonly)
+  
+  return(JH_Data)
 }

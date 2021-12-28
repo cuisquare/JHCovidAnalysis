@@ -2,8 +2,11 @@ library(tidyverse)
 library(lubridate)
 options(digits = 3)   # report 3 significant digits
 
+#TODO include the git pull for vaccine data in UpdateDate, address
 system("UpdateData") #runs data update from github repo
 data_folder <- "./Data/JH_Data_GitHubClone/csse_covid_19_data/csse_covid_19_time_series/"
+#TODO write
+#data_folder_vaccine <- "./Data/JH_Data_GitHubClone/csse_covid_19_data/csse_covid_19_time_series/"
 
 
 ##Deaths
@@ -55,10 +58,47 @@ master_data_recovered <- master_data_recovered %>%
   mutate(Date = mdy(Date))  %>% 
   rename(Country_Region = `Country/Region`, Province_State = `Province/State`)
 
+##vaccine data
+try(download.file(url = "https://raw.githubusercontent.com/govex/COVID-19/master/data_tables/vaccine_data/global_data/time_series_covid19_vaccine_global.csv",destfile = "./Data/time_series_covid19_vaccine_global.csv"))
+try(master_data_raw_vaccine <-   read_csv(file = "./Data/time_series_covid19_vaccine_global.csv"))
+if (exists("master_data_raw_vaccine")) {
+  master_data_vaccine  <- master_data_raw_vaccine
+}
+ 
+#View(master_data_raw_vaccine) #i think that's the one i want
+
 #Merging data
 master_data <- master_data_deaths
 master_data <- left_join(master_data,master_data_confirmed)
 master_data <- left_join(master_data,master_data_recovered)
+if (exists("master_data_raw_vaccine")) {
+  master_data <- left_join(master_data,master_data_vaccine)
+}
+
+#'TODO for countries that do not have it yet, recreate a country_level data 
+#'manually from the purely regional data. the convention for most countries is 
+#'that the country level data in rows where Province_State is NA. But some 
+#'countries do not that populated. Regional only data apply to the following 
+#'countries : Australia, Canada, China. 
+#TODOSTART
+# View(master_data %>% 
+#        select(Country_Region,Province_State) %>%
+#        unique() %>%
+#        mutate(isRegional = !is.na(Province_State)) %>%
+#        group_by(Country_Region,isRegional) %>%
+#        summarise(count = n()) %>%
+#        group_by(Country_Region) %>%
+#        mutate(hasRegional = (sum(isRegional)>0)) %>%
+#        mutate(isRegionalOnly =(hasRegional & (n()==1))) %>%
+#        filter(hasRegional)
+#   )
+
+master_data_try <- master_data %>%
+  addMissingCountryWideData()
+
+master_data <- master_data_try
+
+#TODOEND
 
 #TODO issue on Longitude being slightly different (or precision issue)
 #potential solution, change to character
@@ -180,10 +220,10 @@ print(JHCountries_NotFound_After$Country_Region)
 
 
 #final join, will leave out anything not found
-master_data <- master_data %>%
+master_data_try2 <- master_data %>%
   inner_join(countries_population)
 
-
+master_data <- master_data_try2
 
 Nb_JHCountriesTotal_After <- master_data %>%  select(Country_Region) %>% unique() %>% nrow() #186
 
@@ -218,6 +258,8 @@ master_data <- master_data %>%
   mutate(Increase_Weighted_Confirmed = Weighted_Confirmed - lag(Weighted_Confirmed,1)) %>%
   mutate(Increase_Weighted_Confirmed_Avg = rollapply(data=Increase_Weighted_Confirmed,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
   mutate(Increase_Weighted_Confirmed_Avg_Avg = rollapply(data=Increase_Weighted_Confirmed_Avg,FUN=mean,width=lagvaluedays,fill=NA,align="right")) %>%
+  mutate(People_fully_vaccinated_Perc = 100*People_fully_vaccinated/Population) %>%
+  mutate(People_partially_vaccinated_Perc = 100*People_partially_vaccinated/Population) %>%
   ungroup()
 
 #new data not yet confirmed if useful

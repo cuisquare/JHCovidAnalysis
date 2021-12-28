@@ -38,9 +38,10 @@ memory.limit(size=100000)
 ```{r source_functions, echo=FALSE,message=FALSE, warning=FALSE}
 #extracting the latest data (updating git + calculated data)
 getwd()
-source("./Scripts/JHGetData.R", encoding='utf-8')
 #JH plotting and data extracting functions
 source("./Functions/JHFunctions.R")
+source("./Scripts/JHGetData.R", encoding='utf-8')
+
 
 library(tidyverse)
 library(lubridate)
@@ -91,8 +92,6 @@ top_Increase_Weighted_Confirmed_Avg_Avg <- master_data %>%
                                   datetop = last_day,
                                   ntop = ntop)
 ```
-
-
 ### Increases
 
 ```{r increases_deaths_tables,echo=FALSE,message=FALSE, warning=FALSE}
@@ -283,3 +282,23 @@ master_data %>%
   JHplot_CountryLevel(CountryList,"Weighted_Deaths",simple = simple_plot_type)
 ```
 
+```{r echo=FALSE,message=FALSE, warning=FALSE}
+master_data %>%
+  JHplot_CountryLevel(CountryList,"People_partially_vaccinated",simple = simple_plot_type)
+```
+
+```{r echo=FALSE,message=FALSE, warning=FALSE}
+master_data %>%
+  JHplot_CountryLevel(CountryList,"People_partially_vaccinated_Perc",simple = simple_plot_type)
+```
+
+
+```{r echo=FALSE,message=FALSE, warning=FALSE}
+master_data %>%
+  JHplot_CountryLevel(CountryList,"People_fully_vaccinated",simple = simple_plot_type)
+```
+
+```{r echo=FALSE,message=FALSE, warning=FALSE}
+master_data %>%
+  JHplot_CountryLevel(CountryList,"People_fully_vaccinated_Perc",simple = simple_plot_type)
+```
