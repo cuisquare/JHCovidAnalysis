@@ -32,6 +32,11 @@ countries_unique <- unique(master_data$Country_Region)
 #list of variables to pick from
 var_unique <- names(master_data)
 
+#min and max dates availablw
+minDate <- min(master_data$Date)
+maxDate <- max(master_data$Date)
+
+
 library(shiny)
 
 # Define UI for application that draws a histogram
@@ -50,9 +55,16 @@ ui <- fluidPage(
             selectizeInput(inputId = "SelectedVariable",
                            choices = var_unique,
                            label = "Select Variable",
-                           multiple = FALSE)
+                           multiple = FALSE),
+            
+            dateRangeInput(inputId = "SelectedDates",
+                           label = "Select Date range:",
+                           min = minDate,
+                           max = maxDate)
+            #TODO add date time selection
         ),
 
+        
         # Show a plot of the generated distribution
         mainPanel(
            plotlyOutput("covidPlot")
@@ -65,7 +77,8 @@ server <- function(input, output) {
 
     output$covidPlot <- renderPlotly({
       theplot <- JHGetplot_CountryLevel(
-        JH_Data = master_data,
+        JH_Data = (master_data %>%
+                     filter(Date >= input$SelectedDates[1] & Date <= input$SelectedDates[2])),
         CountryList = input$SelectedCountries,
         VarName = input$SelectedVariable)
       ggplotly(theplot,dynamicTicks = TRUE)
