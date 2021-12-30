@@ -3,15 +3,54 @@ library(lubridate)
 options(digits = 3)   # report 3 significant digits
 
 #TODO include the git pull for vaccine data in UpdateDate, address
-system("UpdateData") #runs data update from github repo
-data_folder <- "./Data/JH_Data_GitHubClone/csse_covid_19_data/csse_covid_19_time_series/"
+data_file_deaths <- "time_series_covid19_deaths_global.csv"
+data_file_recovered <- "time_series_covid19_recovered_global.csv"
+data_file_confirmed <- "time_series_covid19_confirmed_global.csv"
+data_file_vaccines <- "time_series_covid19_vaccine_global.csv"
+datasource_choice <- "DirectDownload" #"GithubPull" #"DirectDownload" #or 
+if (datasource_choice == "GithubPull") {
+  #getting death and cases data
+  system("UpdateData") #runs data update from github repo
+  data_folder_casesdeaths <- "./Data/JH_Data_GitHubClone/csse_covid_19_data/csse_covid_19_time_series/"
+  #getting vaccine data
+  data_folder_vaccines <- "./Data"
+  remote_url_root_vaccines <- "https://raw.githubusercontent.com/govex/COVID-19/master/data_tables/vaccine_data/global_data/"
+  try(
+    download.file(
+      url = paste0(remote_url_root_vaccines,"/",data_file_vaccines),
+      destfile = paste0(data_folder_vaccines,"/",data_file_vaccines)
+    )
+  )}
+if (datasource_choice == "DirectDownload") {
+  #getting death and cases data
+  data_folder_casesdeaths <- "./Data"
+  remote_url_root <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/"
+  file_list_cases_death <- c(data_file_deaths,data_file_recovered,data_file_confirmed)
+  for (filename in file_list_cases_death) {
+    try(
+      download.file(
+        url = paste0(remote_url_root,"/",filename),
+        destfile = paste0(data_folder_casesdeaths,"/",filename)
+      )
+    )
+  }
+   #getting vacine data
+  data_folder_vaccines <- "./Data"
+  remote_url_root_vaccines <- "https://raw.githubusercontent.com/govex/COVID-19/master/data_tables/vaccine_data/global_data/"
+  try(
+    download.file(
+      url = paste0(remote_url_root_vaccines,"/",data_file_vaccines),
+      destfile = paste0(data_folder_vaccines,"/",data_file_vaccines)
+    )
+  )
+  
+}
 #TODO write
 #data_folder_vaccine <- "./Data/JH_Data_GitHubClone/csse_covid_19_data/csse_covid_19_time_series/"
 
 
 ##Deaths
-data_file_deaths <- "time_series_covid19_deaths_global.csv"
-master_data_raw_deaths <- read_csv(paste(data_folder,data_file_deaths,sep=""))
+master_data_raw_deaths <- read_csv(paste(data_folder_casesdeaths,data_file_deaths,sep="/"))
 
 #TODO: ? get data with old metric for death in UK using this link: 
 #https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/909660/COVID-19_Death_Series_20200816.xlsx
@@ -27,8 +66,7 @@ master_data_deaths <- master_data_deaths  %>%
   rename(Country_Region = `Country/Region`, Province_State = `Province/State`)
 
 ##Confirmed Cases
-data_file_confirmed <- "time_series_covid19_confirmed_global.csv"
-master_data_raw_confirmed <- read_csv(paste(data_folder,data_file_confirmed,sep=""))
+master_data_raw_confirmed <- read_csv(paste(data_folder_casesdeaths,data_file_confirmed,sep="/"))
 
 #change into tidy data
 master_data_confirmed <- master_data_raw_confirmed %>% 
@@ -43,8 +81,7 @@ master_data_confirmed <- master_data_confirmed %>%
   rename(Country_Region = `Country/Region`, Province_State = `Province/State`)
 
 ##Recovered Cases
-data_file_recovered <- "time_series_covid19_recovered_global.csv"
-master_data_raw_recovered <- read_csv(paste(data_folder,data_file_recovered,sep=""))
+master_data_raw_recovered <- read_csv(paste(data_folder_casesdeaths,data_file_recovered,sep="/"))
 
 #change into tidy data
 master_data_recovered <- master_data_raw_recovered %>% 
@@ -59,8 +96,7 @@ master_data_recovered <- master_data_recovered %>%
   rename(Country_Region = `Country/Region`, Province_State = `Province/State`)
 
 ##vaccine data
-try(download.file(url = "https://raw.githubusercontent.com/govex/COVID-19/master/data_tables/vaccine_data/global_data/time_series_covid19_vaccine_global.csv",destfile = "./Data/time_series_covid19_vaccine_global.csv"))
-try(master_data_raw_vaccine <-   read_csv(file = "./Data/time_series_covid19_vaccine_global.csv"))
+try(master_data_raw_vaccine <- read_csv(file = paste(data_folder_vaccines,data_file_vaccines,sep="/")))
 if (exists("master_data_raw_vaccine")) {
   master_data_vaccine  <- master_data_raw_vaccine
 }
@@ -71,7 +107,7 @@ if (exists("master_data_raw_vaccine")) {
 master_data <- master_data_deaths
 master_data <- left_join(master_data,master_data_confirmed)
 master_data <- left_join(master_data,master_data_recovered)
-if (exists("master_data_raw_vaccine")) {
+if (exists("master_data_vaccine")) {
   master_data <- left_join(master_data,master_data_vaccine)
 }
 
@@ -263,6 +299,7 @@ master_data <- master_data %>%
   ungroup()
 
 #new data not yet confirmed if useful
+#TODO make those averaged out over a week like rest of data
 master_data <- master_data %>%
   group_by(Country_Region, Province_State) %>%
   mutate(Increase_Increase_Confirmed = (Increase_Weighted_Confirmed - lag(Increase_Weighted_Confirmed,lagvaluedays))/lagvaluedays) %>%
