@@ -12,9 +12,9 @@
 #' data and  plotting be part of a package which then could be loaded.
 
 #generate master data once
-getwd()
+print(getwd())
 #TODO current attempt, to be attempted again 
-setwd("..")
+#setwd("..")
 #JH plotting and data extracting functions
 source("./Functions/JHFunctions.R")
 source("./Scripts/JHGetData.R", encoding='utf-8')
@@ -52,22 +52,22 @@ ui <- fluidPage(
                            choices = countries_unique,
                            label = "Select Countries",
                            multiple = TRUE) ,
-            selectizeInput(inputId = "SelectedVariable",
+            selectizeInput(inputId = "SelectedVariables",
                            choices = var_unique,
-                           label = "Select Variable",
-                           multiple = FALSE),
+                           label = "Select Variables",
+                           multiple = TRUE),
             
             dateRangeInput(inputId = "SelectedDates",
                            label = "Select Date range:",
                            min = minDate,
                            max = maxDate)
-            #TODO add date time selection
         ),
 
         
         # Show a plot of the generated distribution
         mainPanel(
-           plotlyOutput("covidPlot")
+           plotlyOutput(outputId = "covidPlot",height = "600px" #"auto"
+                        )
         )
     )
 )
@@ -76,11 +76,18 @@ ui <- fluidPage(
 server <- function(input, output) {
 
     output$covidPlot <- renderPlotly({
-      theplot <- JHGetplot_CountryLevel(
+      theplot <- JHGetplot_CountryLevel_MultipleVar(
         JH_Data = (master_data %>%
                      filter(Date >= input$SelectedDates[1] & Date <= input$SelectedDates[2])),
         CountryList = input$SelectedCountries,
-        VarName = input$SelectedVariable)
+        VarNames = input$SelectedVariables)
+      
+      # 
+      # theplot <- JHGetplot_CountryLevel(
+      #   JH_Data = (master_data %>%
+      #                filter(Date >= input$SelectedDates[1] & Date <= input$SelectedDates[2])),
+      #   CountryList = input$SelectedCountries,
+      #   VarName = input$SelectedVariables[1])
       ggplotly(theplot,dynamicTicks = TRUE)
     })
 }

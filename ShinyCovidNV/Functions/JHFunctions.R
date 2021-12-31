@@ -12,7 +12,7 @@ getLatestAvailableDate <- function(JH_Data,CountryName) {
 
 getLatestDataSimple <- function(JH_Data,CountryName) {
   LatestAvailableDate <- getLatestAvailableDate(JH_Data,CountryName)
-    
+  
   JH_Data %>% 
     filter(Country_Region == CountryName) %>%
     filter(Date == LatestAvailableDate)
@@ -21,8 +21,8 @@ getLatestDataSimple <- function(JH_Data,CountryName) {
 getLatestData <- function(JH_Data,CountryList,spanDays=FALSE) {
   
   LatestAvailableDate <- as_date(min(sapply(CountryList,
-                                    FUN=function(CN) {
-                                      as_date(getLatestAvailableDate(master_data,CN))})))
+                                            FUN=function(CN) {
+                                              as_date(getLatestAvailableDate(master_data,CN))})))
   
   print(paste("spanDays =",spanDays))
   
@@ -97,7 +97,7 @@ JHGetdata_CountryLevel <- function(JH_Data,CountryList,VarName) {
 }
 
 JHGetplot_CountryLevel_MultipleVar <- function(JH_Data,CountryList,VarNames) {
-
+  
   thedata <- JH_Data %>%
     JHGetMultipledata_CountryLevel(CountryList,VarNames) %>%
     pivot_longer(
@@ -105,13 +105,13 @@ JHGetplot_CountryLevel_MultipleVar <- function(JH_Data,CountryList,VarNames) {
       names_to = "VarName",
       values_to = "Value"
     )
-
+  
   theplot <- thedata  %>%
     ggplot(aes(Date,Value,color = Country_Region)) +
     geom_line() +
     facet_wrap(~VarName, ncol=1,strip.position = "bottom",scales = "free_y") +
     theme(axis.title.y=element_blank())
-
+  
   return(theplot)
 }
 
@@ -179,8 +179,8 @@ JHGetplot_CountryLevel <- function(JH_Data,CountryList,VarName,add_label = FALSE
 
 JHplot_CountryLevel <- function(JH_Data,CountryList,VarName,simple=FALSE,add_label = FALSE,adjust_label = FALSE, mindiffval = 5) {
   
- theplot <- JHGetplot_CountryLevel(JH_Data,CountryList,VarName,add_label,adjust_label,mindiffval)
-
+  theplot <- JHGetplot_CountryLevel(JH_Data,CountryList,VarName,add_label,adjust_label,mindiffval)
+  
   if (simple) {
     print(theplot)
   } else {
@@ -357,7 +357,7 @@ addMissingCountryWideData <- function(JH_Data) {
                        "People_fully_vaccinated"))) %>%
     #group_by(c("Province_State", "Date")) %>%
     summarise_at(.vars = c("Deaths", "Confirmed", "Recovered", "Doses_admin", "People_partially_vaccinated","People_fully_vaccinated"),
-    .funs = function(x) {sum(x,na.rm = TRUE)}
+                 .funs = function(x) {sum(x,na.rm = TRUE)}
     ) 
   
   JH_Data <- JH_Data %>%
