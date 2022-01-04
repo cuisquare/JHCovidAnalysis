@@ -28,14 +28,33 @@ options(scipen = -2)
 
 #list of unique countries to pick from
 countries_unique <- unique(master_data$Country_Region)
+countries_start_selection <- c("France","United Kingdom","Germany","Spain","Italy")
 
 #list of variables to pick from
-var_unique <- names(master_data)
+#Totals
+var_unique_totals <- c(
+  "Deaths", "Weighted_Deaths",
+  "Confirmed", "Weighted_Confirmed",
+  "Recovered", 
+  "Doses_admin", 
+  "People_partially_vaccinated","People_fully_vaccinated", "People_fully_vaccinated_Perc", "People_partially_vaccinated_Perc", 
+  "Population"
+)
+#Increases
+var_unique_increases <- c("Increase_Deaths", "Increase_Deaths_Avg", "Increase_Deaths_Avg_Avg",
+                          "Increase_Weighted_Deaths","Increase_Weighted_Deaths_Avg", "Increase_Weighted_Deaths_Avg_Avg", 
+                          "Increase_Confirmed", "Increase_Confirmed_Avg", "Increase_Confirmed_Avg_Avg",
+                          "Increase_Weighted_Confirmed", "Increase_Weighted_Confirmed_Avg","Increase_Weighted_Confirmed_Avg_Avg", 
+                          "Increase_Increase_Confirmed","Increase_Increase_Deaths", "Rate_Increase_Deaths", "Rate_Increase_Confirmed"
+)
+
+var_unique <- c(var_unique_totals,var_unique_increases)
+var_start_selection <- c("Increase_Deaths_Avg_Avg", "Increase_Confirmed_Avg_Avg")
 
 #min and max dates availablw
 minDate <- min(master_data$Date)
 maxDate <- max(master_data$Date)
-
+startDate_start_selection <- maxDate - lubridate::dmonths(3)
 
 library(shiny)
 
@@ -50,17 +69,22 @@ ui <- fluidPage(
         sidebarPanel(
             selectizeInput(inputId = "SelectedCountries",
                            choices = countries_unique,
+                           selected = countries_start_selection,
                            label = "Select Countries",
-                           multiple = TRUE) ,
+                           multiple = TRUE
+                           ) ,
             selectizeInput(inputId = "SelectedVariables",
                            choices = var_unique,
+                           selected = var_start_selection,
                            label = "Select Variables",
                            multiple = TRUE),
             
             dateRangeInput(inputId = "SelectedDates",
                            label = "Select Date range:",
                            min = minDate,
-                           max = maxDate)
+                           max = maxDate,
+                           start = startDate_start_selection,
+                           end = maxDate)
         ),
 
         
